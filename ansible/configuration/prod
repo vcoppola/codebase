@@ -1,0 +1,100 @@
+#postgres_version: 9.3.25-1.pgdg14.04+1
+
+checkpoint_segments: 25
+checkpoint_timeout: '5min'
+checkpoint_warning: '4min'
+data_directory: '/postgres_data/{{ pg_version }}/main'
+effective_cache_size: '1GB'
+log_destination: 'csvlog'
+log_min_duration_statement_stg: 0
+log_min_duration_statement_prod: 0
+log_temp_files: '20MB'
+maintenance_work_mem: '256MB'
+max_connections: 103
+pg_version: 9.3
+pg_stat_statements_max_stg: '1000'
+pg_stat_statements_track_stg: 'all'
+shared_buffers: '3GB'
+shared_preload_libraries_stg: 'pg_stat_statements'
+temp_buffers: '16MB'
+wal_buffers: '32MB'
+wal_keep_segments: 100
+work_mem: '32MB'
+
+# List of masters - masters have differences in postgresql.conf and also replication scripts
+postgres_masters:
+  - s5pdb018
+  - p5pdb018
+
+# List of servers in STG and PROD for pg_hba.conf in postgres-configs role
+stg_servers:
+  - s5dataops
+  - s6dataops
+
+prd_servers:
+  - p5dataops
+  - p6dataops
+
+# Handle where a server replicates from for the postgres-scripts role
+replicate_from_nj_stg:
+  - s5pdb019
+  - s6pdb018
+replicate_from_co_stg:
+  - s6pdb019
+
+replicate_from_nj_prd:
+  - p5pdb019
+  - p6pdb018
+replicate_from_co_prd:
+  - p6pdb019
+
+nj_master_stg: s5pdb018
+co_master_stg: s6pdb018
+
+nj_master_prd: p5pdb018
+co_master_prd: p6pdb018
+
+#STG pg_hba lines
+stg_pghba: |
+  # Replication
+  host    replication     replicator          10.160.75.108/32       md5 # s5pdb018
+  host    replication     replicator          10.160.75.109/32       md5 # s5pdb019
+  host    replication     replicator          10.161.75.108/32       md5 # s6pdb018
+  host    replication     replicator          10.161.75.109/32       md5 # s6pdb019
+  
+  # PDBA-1860 - changes for hashicorp vault
+  # TYPE  DATABASE        USER                ADDRESS                METHOD
+  host    all            hv_manager          10.160.95.198/32        md5 # s5vault01.ondeck.com
+  host    all            hv_manager          10.160.95.199/32        md5 # s5vault02.ondeck.com
+  host    all            hv_manager          10.160.95.200/32        md5 # s5vault03.ondeck.com
+  host    all            hv_manager          10.161.95.198/32        md5 # s6vault01.ondeck.com
+  host    all            hv_manager          10.161.95.199/32        md5 # s6vault02.ondeck.com
+  host    all            hv_manager          10.161.95.200/32        md5 # s6vault03.ondeck.com
+
+
+  #Rest of connections to use LDAP
+  # New IDs for password rotation as of 2017-07-15
+  host    all             all                  0.0.0.0/0   ldap ldapserver="hosting.ondeck" ldapport="389" ldapsearchattribute="sAMAccountName" ldapbasedn="ou=OnDeck,dc=hosting,dc=ondeck" ldapbinddn="LDAP9_postgres_s"  ldapbindpasswd="C5gyKUp!6rXA"
+
+
+#PROD pg_hba lines
+prd_pghba: |
+  # Replication
+  host    replication     replicator          10.160.70.108/32       md5 # p5pdb018
+  host    replication     replicator          10.160.70.109/32       md5 # p5pdb019
+  host    replication     replicator          10.161.70.108/32       md5 # p6pdb018
+  host    replication     replicator          10.161.70.109/32       md5 # p6pdb019
+  
+  # PDBA-1860 - changes for hashicorp vault
+  # TYPE  DATABASE        USER                ADDRESS                METHOD
+  
+  host    all            hv_manager          10.160.90.203/32        md5 # p5vault01.ondeck.com
+  host    all            hv_manager          10.160.90.204/32        md5 # p5vault02.ondeck.com
+  host    all            hv_manager          10.160.90.205/32        md5 # p5vault03.ondeck.com
+  host    all            hv_manager          10.161.90.203/32        md5 # p6vault01.ondeck.com
+  host    all            hv_manager          10.161.90.204/32        md5 # p6vault02.ondeck.com
+  host    all            hv_manager          10.161.90.205/32        md5 # p6vault03.ondeck.com
+  
+  #All connections to use LDAP
+  # New IDs for password rotation as of 2017-07-15
+  host    all             all                 0.0.0.0/0    ldap ldapserver="hosting.ondeck" ldapport="389" ldapsearchattribute="sAMAccountName" ldapbasedn="ou=OnDeck,dc=hosting,dc=ondeck" ldapbinddn="LDAP9_postgres_p"  ldapbindpasswd="KXNR!w25us46"
