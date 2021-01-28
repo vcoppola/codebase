@@ -74,7 +74,7 @@ stg_pghba: |
 
   #Rest of connections to use LDAP
   # New IDs for password rotation as of 2017-07-15
-  host    all             all                  0.0.0.0/0   ldap ldapserver="hosting.ondeck" ldapport="389" ldapsearchattribute="sAMAccountName" ldapbasedn="ou=OnDeck,dc=hosting,dc=ondeck" ldapbinddn="LDAP9_postgres_s"  ldapbindpasswd="C5gyKUp!6rXA"
+  host    all             all                  0.0.0.0/0   ldap ldapserver="hosting.ondeck" ldapport="389" ldapsearchattribute="sAMAccountName" ldapbasedn="ou=OnDeck,dc=hosting,dc=ondeck" ldapbinddn="LDAP9_postgres_s"  ldapbindpasswd="XXXX"
 
 
 #PROD pg_hba lines
