@@ -1,0 +1,11 @@
+---
+sno_user:  <sno_username>
+sno_pass:  "<sno-password>"
+sno_account:  "<sno_account>"
+sno_authenticator:  "<sno_authenticator>"
+sno_warehouse: "<sno_warehouse>"
+sno_role: "<sno_role>"
+
+pg_user:  <postgres-username>
+pg_pass:  "<postgres-pass>"
+
